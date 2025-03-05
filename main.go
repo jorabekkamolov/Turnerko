@@ -1,8 +1,6 @@
 package main
 
-import (
-	"Turnerko/src/cmd"
-)
+import "github.com/jorabekkamolov/Turnerko/src/cmd"
 
 func main() {
 	cmd.Run()

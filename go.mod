@@ -1,4 +1,5 @@
-module Turnerko
+module github.com/jorabekkamolov/Turnerko
+
 
 go 1.24.0
 
