@@ -1,6 +1,5 @@
 module github.com/jorabekkamolov/Turnerko
 
-
 go 1.24.0
 
 require github.com/charmbracelet/bubbletea v1.3.4
