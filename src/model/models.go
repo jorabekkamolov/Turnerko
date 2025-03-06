@@ -1,20 +1,35 @@
-package models
+package model
 
-type MenuTopicModel struct {
-	choices  []string
-	cursor   int
-	selected map[int]string
+type menuTopicModel struct {
+	choices []string
+	cursor  int
 }
 
-type MenuTasksModel struct {
-	choices  []string
-	cursor   int
-	topic    string
-	selected map[int]string
+type menuTasksModel struct {
+	choices []string
+	cursor  int
+	topic   string
 }
 
-type TextEditorModel struct {
+type textEditorModel struct {
 	filepath string
-	content  []byte
+	content  []rune
 	cursor   int
+}
+
+type checkResult struct {
+	filepath string
+	answer   int
+	success  []string
+	warning  []string
+	errors   []string
+}
+
+type model struct {
+	choices         []string
+	cursor          int
+	menuTopicModel  menuTopicModel
+	menuTasksModel  menuTasksModel
+	textEditorModel textEditorModel
+	checkResult     checkResult
 }

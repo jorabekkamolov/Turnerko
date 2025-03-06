@@ -1,57 +1,25 @@
-package models
+package model
 
 import (
-	"fmt"
-	"os"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
-func initMenuTopicModel() MenuTopicModel {
-	return MenuTopicModel{
-		choices: []string{
-			"IF", "LOOP", "NESTED LOOP",
-			"ARRAY", "STRING",
-		},
-		selected: make(map[int]string),
+func initMenuTopicModel() menuTopicModel {
+	return menuTopicModel{
+		choices: []string{"IF", "LOOP", "NESTED LOOP", "ARRAY", "STRING"},
 	}
 }
 
-func initMenuTasksModel(topic string) MenuTasksModel {
-	tasks := getTopicTasks(topic)
-	return MenuTasksModel{
-		topic:    topic,
-		choices:  tasks,
-		selected: make(map[int]string),
+func initModel() *model {
+	return &model{
+		choices:         []string{"Topic", "Tasks", "Editor", "Result"},
+		menuTopicModel:  initMenuTopicModel(),
+		menuTasksModel:  menuTasksModel{},
+		textEditorModel: textEditorModel{},
+		checkResult:     checkResult{},
 	}
 }
 
-func inittextEditorModel(filepath string) TextEditorModel {
-	data, err := os.ReadFile(filepath)
-	if err != nil {
-		data = []byte("Yangi fayl. Matnni o'zgartiring...\n")
-	}
-	return TextEditorModel{
-		filepath: filepath,
-		content:  []byte(string(data)),
-	}
-}
-
-func getTopicTasks(topic string) []string {
-	var tasks []string
-	var taskCount int
-
-	switch topic {
-	case "IF":
-		taskCount = 20
-	case "LOOP", "NESTED LOOP":
-		taskCount = 25
-	case "ARRAY":
-		taskCount = 20
-	case "STRING":
-		taskCount = 15
-	}
-
-	for i := 1; i <= taskCount; i++ {
-		tasks = append(tasks, fmt.Sprintf("%d-Task", i))
-	}
-	return tasks
+func (m model) Init() tea.Cmd {
+	return nil
 }

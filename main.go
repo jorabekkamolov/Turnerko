@@ -1,7 +1,7 @@
 package main
 
-import "github.com/jorabekkamolov/Turnerko/src/cmd"
+import "github.com/jorabekkamolov/Turnerko/src/model"
 
 func main() {
-	cmd.Run()
+	model.Run()
 }
