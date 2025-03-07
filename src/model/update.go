@@ -37,6 +37,8 @@ func (m *model) funcUpdateTopic(msg tea.Msg) tea.Cmd {
 			m.updateTaskModel()
 			m.updateEditorModel()
 			m.cursor++
+		case "Q", "q":
+			cmd = tea.Quit
 		}
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
@@ -173,7 +175,7 @@ func (m *model) updateTaskModel() {
 }
 
 func (m *model) updateEditorModel() {
-	filepath := fmt.Sprintf("C/%s/%s.txt",
+	filepath := fmt.Sprintf("C/%s/%s.c",
 		m.menuTopicModel.choices[m.menuTopicModel.cursor],
 		m.menuTasksModel.choices[m.menuTasksModel.cursor])
 	m.textEditorModel.filepath = filepath

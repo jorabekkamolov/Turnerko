@@ -27,3 +27,30 @@ func (m *model) styleTopic() (lipgloss.Style, lipgloss.Style) {
 			Margin(1, 2).
 			Align(lipgloss.Center)
 }
+
+func (m *model) styleTask() (lipgloss.Style, lipgloss.Style) {
+
+	return lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#28DF99")).
+			Bold(true).
+			Italic(true),
+
+		lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#9400D3")).
+			Bold(true).
+			Faint(true).
+			Italic(true)
+}
+
+func (m *model) styleTaskBorder() lipgloss.Style {
+	return lipgloss.NewStyle().
+		BorderStyle(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("#28DF99")).
+		Padding(1, 3).
+		Margin(1, 1)
+}
+
+func (m *model) styleText() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#FCFFC9"))
+}
