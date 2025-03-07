@@ -28,6 +28,8 @@ type checkResult struct {
 type model struct {
 	choices         []string
 	cursor          int
+	width           int
+	height          int
 	menuTopicModel  menuTopicModel
 	menuTasksModel  menuTasksModel
 	textEditorModel textEditorModel

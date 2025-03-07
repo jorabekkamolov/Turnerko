@@ -1,30 +1,32 @@
 package model
 
 import (
-	"fmt"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/common-nighthawk/go-figure"
 )
 
 func (m model) View() string {
 	var s string
-	var s1 string
+
 	if m.choices[m.cursor] == "Topic" {
-		for _, choice := range m.choices {
-			s += fmt.Sprintf("%s\n", choice)
+		var styledChoices []string
+		greenStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#28DF99"))
+		purpleStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#9400D3"))
+		fig1 := greenStyle.Render(figure.NewFigure("School 21", "slant", true).String())
+		fig2 := purpleStyle.Render(figure.NewFigure("Turnerko", "slant", true).String())
+		style1, style2 := m.styleTopic()
+		styledChoices = make([]string, len(m.menuTopicModel.choices))
+
+		for i, choice := range m.menuTopicModel.choices {
+			if i == m.menuTopicModel.cursor {
+				styledChoices[i] = style1.Render(choice)
+			} else {
+				styledChoices[i] = style2.Render(choice)
+			}
 		}
-	} else if m.choices[m.cursor] == "Tasks" {
-		for _, choice := range m.menuTasksModel.choices {
-			s += fmt.Sprintf("%s\n", choice)
-		}
-		s += string(m.textEditorModel.content)
-	} else if m.choices[m.cursor] == "Editor" {
-		if m.textEditorModel.cursor < len(m.textEditorModel.content) &&
-			m.textEditorModel.content[m.textEditorModel.cursor] == '\t' {
-			s1 = string(m.textEditorModel.content)
-		} else {
-			s1 = string(m.textEditorModel.content[:m.textEditorModel.cursor]) +
-				"|" +
-				string(m.textEditorModel.content[m.textEditorModel.cursor:])
-		}
+		asciiBlock := lipgloss.JoinVertical(lipgloss.Center, fig1, fig2)
+		s = lipgloss.JoinVertical(lipgloss.Center, lipgloss.JoinHorizontal(lipgloss.Center, styledChoices...), asciiBlock)
 	}
-	return s1
+
+	return s
 }

@@ -11,7 +11,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd = nil
 	switch m.choices[m.cursor] {
 	case "Topic":
-		m.funcUpdateTopic(msg)
+		cmd = m.funcUpdateTopic(msg)
 	case "Tasks":
 		m.funcUpdateTasks(msg)
 	case "Editor":
@@ -20,7 +20,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *model) funcUpdateTopic(msg tea.Msg) {
+func (m *model) funcUpdateTopic(msg tea.Msg) tea.Cmd {
+	var cmd tea.Cmd = nil
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -37,7 +38,12 @@ func (m *model) funcUpdateTopic(msg tea.Msg) {
 			m.updateEditorModel()
 			m.cursor++
 		}
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		m.height = msg.Height
+		cmd = tea.ClearScreen
 	}
+	return cmd
 }
 
 func (m *model) funcUpdateTasks(msg tea.Msg) {
@@ -175,7 +181,6 @@ func (m *model) updateEditorModel() {
 	if err != nil {
 		data = []byte("Yangi fayl. Matnni o'zgartiring...\n")
 	}
-	// data = append(data, ' '\)
 	m.textEditorModel.content = []rune(string(data))
 }
 
