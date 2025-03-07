@@ -4,21 +4,20 @@ import (
 	"fmt"
 	"os"
 
-	"slices"
-
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd = nil
 	switch m.choices[m.cursor] {
 	case "Topic":
 		m.funcUpdateTopic(msg)
 	case "Tasks":
 		m.funcUpdateTasks(msg)
 	case "Editor":
-		m.funcUpdateEditor(msg)
+		cmd = m.funcUpdateEditor(msg)
 	}
-	return m, nil
+	return m, cmd
 }
 
 func (m *model) funcUpdateTopic(msg tea.Msg) {
@@ -55,13 +54,16 @@ func (m *model) funcUpdateTasks(msg tea.Msg) {
 				m.menuTasksModel.cursor--
 				m.updateEditorModel()
 			}
+		case "Q", "q":
+			m.cursor--
 		case "enter", " ":
 			m.cursor++
 		}
 	}
 }
 
-func (m *model) funcUpdateEditor(msg tea.Msg) {
+func (m *model) funcUpdateEditor(msg tea.Msg) tea.Cmd {
+	var cmd tea.Cmd = nil
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -75,11 +77,16 @@ func (m *model) funcUpdateEditor(msg tea.Msg) {
 			}
 		case "backspace":
 			if m.textEditorModel.cursor > 0 {
-				m.textEditorModel.content = slices.Delete(
-					m.textEditorModel.content, m.textEditorModel.cursor-1,
-					m.textEditorModel.cursor,
+				if m.textEditorModel.content[m.textEditorModel.cursor-1] == '\t' ||
+					m.textEditorModel.content[m.textEditorModel.cursor-1] == '\n' {
+					cmd = tea.ClearScreen
+				}
+				m.textEditorModel.content = append(
+					m.textEditorModel.content[:m.textEditorModel.cursor-1],
+					m.textEditorModel.content[m.textEditorModel.cursor:]...,
 				)
 				m.textEditorModel.cursor--
+
 			}
 		case "enter":
 			m.textEditorModel.content = append(
@@ -87,6 +94,62 @@ func (m *model) funcUpdateEditor(msg tea.Msg) {
 				append([]rune{'\n'}, m.textEditorModel.content[m.textEditorModel.cursor:]...)...,
 			)
 			m.textEditorModel.cursor++
+		case "down":
+			var back int = 0
+			var temp int = m.textEditorModel.cursor
+
+			for temp > 0 && m.textEditorModel.content[temp-1] != '\n' {
+				temp--
+				back++
+			}
+			if temp+back >= len(m.textEditorModel.content) {
+				break
+			}
+
+			for m.textEditorModel.cursor < len(m.textEditorModel.content) &&
+				m.textEditorModel.content[m.textEditorModel.cursor] != '\n' {
+				m.textEditorModel.cursor++
+			}
+
+			if m.textEditorModel.cursor < len(m.textEditorModel.content) {
+				m.textEditorModel.cursor++
+			}
+			for back > 0 && m.textEditorModel.cursor < len(m.textEditorModel.content) &&
+				m.textEditorModel.content[m.textEditorModel.cursor] != '\n' {
+				m.textEditorModel.cursor++
+				back--
+			}
+
+		case "up":
+			var back int = 0
+			var temp int = m.textEditorModel.cursor
+			for temp > 0 && m.textEditorModel.content[temp-1] != '\n' {
+				temp--
+				back++
+			}
+			if temp == 0 {
+				break
+			}
+			temp--
+			for temp > 0 && m.textEditorModel.content[temp-1] != '\n' {
+				temp--
+			}
+			var newCursor = temp
+			for back > 0 && newCursor < len(m.textEditorModel.content) &&
+				m.textEditorModel.content[newCursor] != '\n' {
+				newCursor++
+				back--
+			}
+
+			m.textEditorModel.cursor = newCursor
+		case "tab":
+			m.textEditorModel.content = append(
+				m.textEditorModel.content[:m.textEditorModel.cursor],
+				append([]rune{'\t'}, m.textEditorModel.content[m.textEditorModel.cursor:]...)...,
+			)
+			m.textEditorModel.cursor++
+			cmd = tea.ClearScreen
+		case "insert", "delete":
 		default:
 			m.textEditorModel.content = append(
 				m.textEditorModel.content[:m.textEditorModel.cursor],
@@ -95,6 +158,7 @@ func (m *model) funcUpdateEditor(msg tea.Msg) {
 			m.textEditorModel.cursor++
 		}
 	}
+	return cmd
 }
 
 func (m *model) updateTaskModel() {
@@ -111,6 +175,7 @@ func (m *model) updateEditorModel() {
 	if err != nil {
 		data = []byte("Yangi fayl. Matnni o'zgartiring...\n")
 	}
+	// data = append(data, ' '\)
 	m.textEditorModel.content = []rune(string(data))
 }
 

@@ -21,5 +21,6 @@ func initModel() model {
 }
 
 func (m model) Init() tea.Cmd {
-	return nil
+	// Ekranni tozalash va boshlang‘ich interfeysni qaytarish
+	return tea.ClearScreen
 }

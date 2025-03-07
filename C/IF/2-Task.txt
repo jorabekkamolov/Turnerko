@@ -16,7 +16,8 @@ func initModel() model {
 		menuTopicModel:  initMenuTopicModel(),
 		menuTasksModel:  menuTasksModel{},
 		textEditorModel: textEditorModel{},
-		checkResult:     checkResult{},
+		checkResult{},
+sdfdddddddddddddddddddddddddddddddddddddddddddddddd
 	}
 }
 
