@@ -7,72 +7,60 @@ import (
 )
 
 func (m model) View() string {
-	var s string
+	var output string
 
-	if m.choices[m.cursor] == "Topic" {
-		var styledChoices []string
-		greenStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#28DF99"))
-		purpleStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#9400D3"))
-		fig1 := greenStyle.Render(figure.NewFigure("School 21", "slant", true).String())
-		fig2 := purpleStyle.Render(figure.NewFigure("Turnerko", "slant", true).String())
+	switch m.choices[m.cursor] {
+	case "Topic":
+		selectedStyle, defaultStyle := m.styleTopic()
+		titleStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#28DF99"))
+		subtitleStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#9400D3"))
+		title := titleStyle.Render(figure.NewFigure("School 21", "slant", true).String())
+		subtitle := subtitleStyle.Render(figure.NewFigure("Turnerko", "slant", true).String())
 
-		style1, style2 := m.styleTopic()
-		styledChoices = make([]string, len(m.menuTopicModel.choices))
-		for i, choice := range m.menuTopicModel.choices {
-			if i == m.menuTopicModel.cursor {
-				styledChoices[i] = style1.Render(choice)
-			} else {
-				styledChoices[i] = style2.Render(choice)
-			}
-		}
-		asciiBlock := lipgloss.JoinVertical(lipgloss.Center, fig1, fig2)
-		s = lipgloss.JoinVertical(lipgloss.Center, lipgloss.JoinHorizontal(lipgloss.Center, styledChoices...), asciiBlock)
+		styledTopics := styleChoiceList(m.menuTopicModel.choices, m.menuTopicModel.cursor, selectedStyle, defaultStyle)
+		asciiBlock := lipgloss.JoinVertical(lipgloss.Center, title, subtitle)
+		output = lipgloss.JoinVertical(lipgloss.Center, lipgloss.JoinHorizontal(lipgloss.Center, styledTopics...), asciiBlock)
 
-	} else if m.choices[m.cursor] == "Tasks" {
-		styledChoices := make([]string, len(m.menuTasksModel.choices))
-		style1, style2 := m.styleTask()
-		style3 := m.styleTaskBorder()
-		style4 := m.styleText()
+	case "Tasks":
+		selectedStyle, defaultStyle := m.styleTask()
+		styledTasks := styleChoiceList(m.menuTasksModel.choices, m.menuTasksModel.cursor, selectedStyle, defaultStyle)
+		taskContent, _ := glamour.Render(string(m.textEditorModel.content), "dark")
 
-		for i, choice := range m.menuTasksModel.choices {
-			if i == m.menuTasksModel.cursor {
-				styledChoices[i] = style1.Render("> " + choice)
-			} else {
-				styledChoices[i] = style2.Render("  " + choice)
-			}
-		}
-		list1 := style3.Render(lipgloss.JoinVertical(lipgloss.Center, styledChoices...))
-		str, _ := glamour.Render(string(m.textEditorModel.content), "dark")
-		list2 := style3.Render(style4.Render(lipgloss.JoinVertical(lipgloss.Center, str)))
-		s = lipgloss.JoinHorizontal(lipgloss.Top, list1, list2)
+		taskList := m.styleTaskBorder().Render(lipgloss.JoinVertical(lipgloss.Center, styledTasks...))
+		contentBox := m.styleTaskBorder().Render(m.styleText().Render(lipgloss.JoinVertical(lipgloss.Center, taskContent)))
 
-	} else if m.choices[m.cursor] == "Editor" {
-		styledChoices := make([]string, len(m.menuTasksModel.choices))
-		style1, style2 := m.styleTask()
-		style3 := m.styleTaskBorder()
+		output = lipgloss.JoinHorizontal(lipgloss.Top, taskList, contentBox)
 
-		for i, choice := range m.menuTasksModel.choices {
-			if i == m.menuTasksModel.cursor {
-				styledChoices[i] = style1.Render("> " + choice)
-			} else {
-				styledChoices[i] = style2.Render("  " + choice)
-			}
-		}
+	case "Editor":
+		selectedStyle, defaultStyle := m.styleTask()
+		styledTasks := styleChoiceList(m.menuTasksModel.choices, m.menuTasksModel.cursor, selectedStyle, defaultStyle)
+		editorContent := addCursorMarker(m.textEditorModel.content, m.textEditorModel.cursor)
+		formattedContent, _ := glamour.Render(editorContent, "dark")
 
-		var s1 string
-		if m.textEditorModel.cursor < len(m.textEditorModel.content) &&
-			m.textEditorModel.content[m.textEditorModel.cursor] == '\t' {
-			s1 = string(m.textEditorModel.content)
-		} else {
-			s1 = string(m.textEditorModel.content[:m.textEditorModel.cursor]) +
-				"|" +
-				string(m.textEditorModel.content[m.textEditorModel.cursor:])
-		}
-		str, _ := glamour.Render(s1, "dark")
-		list1 := style3.Render(lipgloss.JoinVertical(lipgloss.Center, styledChoices...))
-		list2 := style3.Render(lipgloss.JoinVertical(lipgloss.Center, str))
-		s = lipgloss.JoinHorizontal(lipgloss.Top, list1, list2)
+		taskList := m.styleTaskBorder().Render(lipgloss.JoinVertical(lipgloss.Center, styledTasks...))
+		editorBox := m.styleTaskBorder().Render(lipgloss.JoinVertical(lipgloss.Center, formattedContent))
+		output = lipgloss.JoinHorizontal(lipgloss.Top, taskList, editorBox)
 	}
 
-	return s
+	return output
+}
+
+func styleChoiceList(choices []string, cursorIndex int, selectedStyle lipgloss.Style, defaultStyle lipgloss.Style) []string {
+	styledList := make([]string, len(choices))
+
+	for i, choice := range choices {
+		if i == cursorIndex {
+			styledList[i] = selectedStyle.Render(choice)
+		} else {
+			styledList[i] = defaultStyle.Render(choice)
+		}
+	}
+	return styledList
+}
+
+func addCursorMarker(content []rune, cursorIndex int) string {
+	if cursorIndex < len(content) && content[cursorIndex] == '\t' {
+		return string(content)
+	}
+	return string(content[:cursorIndex]) + "|" + string(content[cursorIndex:])
 }

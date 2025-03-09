@@ -1,7 +1,5 @@
-```c
-#include <stdio.h>
+```c 
 
 int main() {
-    printf("Salom, Dunyo!");
-    return 0;
+    sacnf("%d", 12);
 }

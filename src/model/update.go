@@ -69,6 +69,27 @@ func (m *model) funcUpdateTasks(msg tea.Msg) {
 		}
 	}
 }
+func (m *model) funcCountTabs() int {
+	if m.textEditorModel.cursor == 0 {
+		return 0
+	}
+
+	temp := m.textEditorModel.cursor - 2
+	answer := 0
+	for temp >= 0 {
+		if m.textEditorModel.content[temp] == '\n' {
+			break
+		}
+		temp--
+	}
+	temp++
+	for temp < len(m.textEditorModel.content)-1 && m.textEditorModel.content[temp] == '\t' {
+		answer++
+		temp++
+	}
+
+	return answer
+}
 
 func (m *model) funcUpdateEditor(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd = nil
@@ -80,11 +101,11 @@ func (m *model) funcUpdateEditor(msg tea.Msg) tea.Cmd {
 				m.textEditorModel.cursor++
 			}
 		case "left":
-			if m.textEditorModel.cursor > 0 {
+			if m.textEditorModel.cursor > 4 {
 				m.textEditorModel.cursor--
 			}
 		case "backspace":
-			if m.textEditorModel.cursor > 0 {
+			if m.textEditorModel.cursor > 4 {
 				if m.textEditorModel.content[m.textEditorModel.cursor-1] == '\t' ||
 					m.textEditorModel.content[m.textEditorModel.cursor-1] == '\n' {
 					cmd = tea.ClearScreen
@@ -102,6 +123,16 @@ func (m *model) funcUpdateEditor(msg tea.Msg) tea.Cmd {
 				append([]rune{'\n'}, m.textEditorModel.content[m.textEditorModel.cursor:]...)...,
 			)
 			m.textEditorModel.cursor++
+			countTabs := m.funcCountTabs()
+			tabs := make([]rune, countTabs)
+			for i := range countTabs {
+				tabs[i] = '\t'
+			}
+			m.textEditorModel.content = append(
+				m.textEditorModel.content[:m.textEditorModel.cursor],
+				append(tabs, m.textEditorModel.content[m.textEditorModel.cursor:]...)...,
+			)
+			m.textEditorModel.cursor += countTabs
 		case "down":
 			var back int = 0
 			var temp int = m.textEditorModel.cursor
@@ -157,7 +188,19 @@ func (m *model) funcUpdateEditor(msg tea.Msg) tea.Cmd {
 			)
 			m.textEditorModel.cursor++
 			cmd = tea.ClearScreen
-		case "insert", "delete", "ctrl+@", "ctrl+h":
+		case "insert", "delete", "ctrl+@", "ctrl+h", "ctrl+c":
+		case "{":
+			m.textEditorModel.content = append(
+				m.textEditorModel.content[:m.textEditorModel.cursor],
+				append([]rune("{}"), m.textEditorModel.content[m.textEditorModel.cursor:]...)...,
+			)
+			m.textEditorModel.cursor += 1
+		case "(":
+			m.textEditorModel.content = append(
+				m.textEditorModel.content[:m.textEditorModel.cursor],
+				append([]rune("()"), m.textEditorModel.content[m.textEditorModel.cursor:]...)...,
+			)
+			m.textEditorModel.cursor += 1
 		case "esc":
 			cmd = tea.ClearScreen
 			m.updateEditorModel()
@@ -183,6 +226,7 @@ func (m *model) updateEditorModel() {
 		m.menuTopicModel.choices[m.menuTopicModel.cursor],
 		m.menuTasksModel.choices[m.menuTasksModel.cursor])
 	m.textEditorModel.filepath = filepath
+	m.textEditorModel.cursor = 5
 	data, err := os.ReadFile(filepath)
 	if err != nil {
 		data = []byte("Yangi fayl. Matnni o'zgartiring...\n")
