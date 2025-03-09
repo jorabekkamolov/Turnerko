@@ -1,8 +1,7 @@
+```c
 #include <stdio.h>
 
 int main() {
-    int a = 0;
-    scanf("%d", &a);
-    printf("%d", a);
+    printf("Salom, Dunyo!");
     return 0;
 }

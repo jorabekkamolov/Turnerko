@@ -157,7 +157,11 @@ func (m *model) funcUpdateEditor(msg tea.Msg) tea.Cmd {
 			)
 			m.textEditorModel.cursor++
 			cmd = tea.ClearScreen
-		case "insert", "delete":
+		case "insert", "delete", "ctrl+@", "ctrl+h":
+		case "esc":
+			cmd = tea.ClearScreen
+			m.updateEditorModel()
+			m.cursor--
 		default:
 			m.textEditorModel.content = append(
 				m.textEditorModel.content[:m.textEditorModel.cursor],
@@ -184,6 +188,7 @@ func (m *model) updateEditorModel() {
 		data = []byte("Yangi fayl. Matnni o'zgartiring...\n")
 	}
 	m.textEditorModel.content = []rune(string(data))
+	m.textEditorModel.cursor = 0
 }
 
 func getTopicTasks(topic string) []string {
