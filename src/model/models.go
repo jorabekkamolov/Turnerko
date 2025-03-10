@@ -1,6 +1,6 @@
 package model
 
-import "time"
+// import "time"
 
 type menuTopicModel struct {
 	choices []string
@@ -14,11 +14,11 @@ type menuTasksModel struct {
 }
 
 type textEditorModel struct {
-	filepath  string
-	content   []rune
-	cursor    int
-	lastTime  time.Time
-	saveStack []int
+	filepath string
+	content  []rune
+	cursor   int
+	// lastTime  time.Time
+	// saveStack []int
 }
 
 type checkResult struct {

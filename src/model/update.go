@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"slices"
-	"time"
+	// "time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -74,13 +74,13 @@ func (m *model) funcUpdateTasks(msg tea.Msg) {
 	}
 }
 func (m *model) funcCountTabs() int {
-	if m.textEditorModel.cursor == 7 {
+	if m.textEditorModel.cursor == 5 {
 		return 0
 	}
 
 	temp := m.textEditorModel.cursor - 2
 	answer := 0
-	for temp >= 7 {
+	for temp >= 5 {
 		if m.textEditorModel.content[temp] == '\n' {
 			break
 		}
@@ -98,18 +98,18 @@ func (m *model) funcUpdateEditor(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd = nil
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		now := time.Now()
+		// now := time.Now()
 		switch msg.String() {
 		case "right":
 			if m.textEditorModel.cursor < len(m.textEditorModel.content) {
 				m.textEditorModel.cursor++
 			}
 		case "left":
-			if m.textEditorModel.cursor > 7 {
+			if m.textEditorModel.cursor > 5 {
 				m.textEditorModel.cursor--
 			}
 		case "backspace":
-			if m.textEditorModel.cursor > 7 {
+			if m.textEditorModel.cursor > 5 {
 				if m.textEditorModel.content[m.textEditorModel.cursor-1] == '\t' ||
 					m.textEditorModel.content[m.textEditorModel.cursor-1] == '\n' {
 					cmd = tea.ClearScreen
@@ -154,7 +154,7 @@ func (m *model) funcUpdateEditor(msg tea.Msg) tea.Cmd {
 			var back int = 0
 			var temp int = m.textEditorModel.cursor
 
-			for temp > 0 && m.textEditorModel.content[temp-1] != '\n' {
+			for temp > 5 && m.textEditorModel.content[temp-1] != '\n' {
 				temp--
 				back++
 			}
@@ -179,19 +179,19 @@ func (m *model) funcUpdateEditor(msg tea.Msg) tea.Cmd {
 		case "up":
 			var back int = 0
 			var temp int = m.textEditorModel.cursor
-			for temp > 0 && m.textEditorModel.content[temp-1] != '\n' {
+			for temp >= 5 && m.textEditorModel.content[temp-1] != '\n' {
 				temp--
 				back++
 			}
-			if temp == 0 {
+			if temp <= 5 {
 				break
 			}
 			temp--
-			for temp > 0 && m.textEditorModel.content[temp-1] != '\n' {
+			for temp >= 5 && m.textEditorModel.content[temp] != '\n' {
 				temp--
 			}
 			var newCursor = temp
-			for back > 0 && newCursor < len(m.textEditorModel.content) &&
+			for back >= 5 && newCursor < len(m.textEditorModel.content) &&
 				m.textEditorModel.content[newCursor] != '\n' {
 				newCursor++
 				back--
@@ -229,19 +229,19 @@ func (m *model) funcUpdateEditor(msg tea.Msg) tea.Cmd {
 			cmd = tea.ClearScreen
 			m.updateEditorModel()
 			m.cursor--
-		case "ctrl+z":
+		// case "ctrl+z":
 		default:
-			timeDiff := now.Sub(m.textEditorModel.lastTime)
-			if timeDiff > 300*time.Millisecond {
-				m.textEditorModel.saveStack = append(m.textEditorModel.saveStack, m.textEditorModel.cursor)
-			}
+			// timeDiff := now.Sub(m.textEditorModel.lastTime)
+			// if timeDiff > 300*time.Millisecond {
+			// 	m.textEditorModel.saveStack = append(m.textEditorModel.saveStack, m.textEditorModel.cursor)
+			// }
 			m.textEditorModel.content = append(
 				m.textEditorModel.content[:m.textEditorModel.cursor],
 				append([]rune(msg.String()), m.textEditorModel.content[m.textEditorModel.cursor:]...)...,
 			)
 			m.textEditorModel.cursor++
 		}
-		m.textEditorModel.lastTime = now
+		// m.textEditorModel.lastTime = now
 	}
 	return cmd
 }
@@ -256,8 +256,8 @@ func (m *model) updateEditorModel() {
 		m.menuTopicModel.choices[m.menuTopicModel.cursor],
 		m.menuTasksModel.choices[m.menuTasksModel.cursor])
 	m.textEditorModel.filepath = filepath
-	m.textEditorModel.cursor = 7
-	m.textEditorModel.lastTime = time.Now()
+	m.textEditorModel.cursor = 5
+	// m.textEditorModel.lastTime = time.Now()
 	data, err := os.ReadFile(filepath)
 	if err != nil {
 		data = []byte("Yangi fayl. Matnni o'zgartiring...\n")

@@ -1,1 +1,2 @@
-Saloma
+```c
+int main
