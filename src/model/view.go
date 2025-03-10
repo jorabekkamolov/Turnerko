@@ -59,8 +59,5 @@ func styleChoiceList(choices []string, cursorIndex int, selectedStyle lipgloss.S
 }
 
 func addCursorMarker(content []rune, cursorIndex int) string {
-	if cursorIndex < len(content) && content[cursorIndex] == '\t' {
-		return string(content)
-	}
 	return string(content[:cursorIndex]) + "|" + string(content[cursorIndex:])
 }
