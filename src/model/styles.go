@@ -6,7 +6,7 @@ func (m *model) styleTopic() (lipgloss.Style, lipgloss.Style) {
 
 	return lipgloss.NewStyle().
 			BorderStyle(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color("#28DF99")). // Neon yashil border
+			BorderForeground(lipgloss.Color("#28DF99")).
 			Background(lipgloss.Color("#28DF99")).
 			Foreground(lipgloss.Color("#062743")).
 			Bold(true).
@@ -17,7 +17,7 @@ func (m *model) styleTopic() (lipgloss.Style, lipgloss.Style) {
 
 		lipgloss.NewStyle().
 			BorderStyle(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color("#9400D3")). // Neon filotini borderni rangi
+			BorderForeground(lipgloss.Color("#9400D3")).
 			Background(lipgloss.Color("#9400D3")).
 			Foreground(lipgloss.Color("#062743")).
 			Bold(true).
